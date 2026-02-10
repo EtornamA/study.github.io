@@ -10,10 +10,6 @@ const LandingPage = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background" />
         <div className="relative container mx-auto px-4 py-20 md:py-32">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-4">
-              <Sparkles className="w-4 h-4" />
-              AI-Powered Study Platform
-            </div>
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
               <span className="text-gradient">The Future of</span>
               <br />
