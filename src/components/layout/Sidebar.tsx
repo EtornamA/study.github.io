@@ -56,20 +56,25 @@ export function Sidebar() {
     >
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between border-b border-border px-4">
+        <div className="flex h-16 items-center justify-between border-b border-border px-4 bg-sidebar">
           {sidebarOpen && (
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg gradient-primary flex items-center justify-center">
-                <span className="text-lg font-bold text-primary-foreground">F</span>
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-sm">
+                <span className="text-lg font-bold text-white">F</span>
               </div>
-              <span className="text-lg font-semibold text-foreground">Focus</span>
+              <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">Forward</span>
+            </div>
+          )}
+          {!sidebarOpen && (
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-sm mx-auto">
+              <span className="text-lg font-bold text-white">F</span>
             </div>
           )}
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={toggleSidebar}
-            className="shrink-0"
+            className="shrink-0 hover:bg-secondary"
           >
             {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </Button>
@@ -84,10 +89,10 @@ export function Sidebar() {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    ? "bg-primary/10 text-primary shadow-sm border border-primary/20"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground hover:shadow-sm"
                 )}
               >
                 <item.icon className="h-5 w-5 shrink-0" />

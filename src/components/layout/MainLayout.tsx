@@ -14,11 +14,13 @@ export function MainLayout() {
       <GlobalSearchDialog />
       <main
         className={cn(
-          "min-h-screen transition-all duration-300",
+          "min-h-screen transition-all duration-300 bg-background",
           sidebarOpen ? "ml-64" : "ml-16"
         )}
       >
-        <Outlet />
+        <div className="container mx-auto px-6 py-8">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
