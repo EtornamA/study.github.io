@@ -328,7 +328,7 @@ export function TodoPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">To-Do & Assignments</h1>
+          <h1 className="text-2xl font-bold text-foreground">Assignments</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Track your assignments and tasks across all classes
           </p>

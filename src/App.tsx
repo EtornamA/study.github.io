@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 import LandingPage from "@/pages/LandingPage";
 import CalendarPage from "@/pages/CalendarPage";
+import ClassesPage from "@/pages/ClassesPage";
 import TodoPage from "@/pages/TodoPage";
 import NotebookPage from "@/pages/NotebookPage";
 import RecapPage from "@/pages/RecapPage";
@@ -61,6 +62,8 @@ const App = () => (
           <Route element={<MainLayout />}>
             <Route path="/app" element={<HomeRedirect />} />
             <Route path="/app/calendar" element={<CalendarPage />} />
+            <Route path="/app/classes" element={<ClassesPage />} />
+            <Route path="/app/classes/:classId" element={<ClassesPage />} />
             <Route path="/app/todo" element={<TodoPage />} />
             <Route path="/app/notebook" element={<NotebookPage />} />
             <Route path="/app/recap" element={<RecapPage />} />

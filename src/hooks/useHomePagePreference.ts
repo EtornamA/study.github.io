@@ -14,7 +14,7 @@ export interface HomePageConfig {
 
 export const homePageOptions: HomePageConfig[] = [
   { value: '/app', label: 'Calendar' },
-  { value: '/app/todo', label: 'To-Do' },
+  { value: '/app/todo', label: 'Assignments' },
   { value: '/app/notebook', label: 'Notebook' },
   { value: '/app/recap', label: 'Weekly Recap' },
   { value: '/app/settings', label: 'Settings' },

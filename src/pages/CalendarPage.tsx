@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarMonthView } from '@/components/calendar/CalendarMonthView';
 import { CalendarWeekView } from '@/components/calendar/CalendarWeekView';
 import { EventDetailSheet } from '@/components/calendar/EventDetailSheet';
+import { CalendarIntegrations } from '@/components/calendar/CalendarIntegrations';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/useAppStore';
 import { Event, CalendarView } from '@/types';
@@ -39,6 +40,9 @@ export function CalendarPage() {
         </div>
         
         <div className="flex items-center gap-2">
+          {/* Calendar Integrations */}
+          <CalendarIntegrations />
+          
           {/* View Switcher */}
           <div className="flex rounded-lg border border-border p-1">
             {views.map(({ value, icon: Icon }) => (

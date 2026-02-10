@@ -35,6 +35,21 @@ export function useAuth() {
   }, []);
 
   useEffect(() => {
+    // Check for mock auth first
+    const mockAuth = localStorage.getItem('mock-auth');
+    if (mockAuth) {
+      try {
+        const { user, session, profile } = JSON.parse(mockAuth);
+        setUser(user);
+        setSession(session);
+        setProfile(profile);
+        setLoading(false);
+        return;
+      } catch (e) {
+        // If parsing fails, continue with normal auth
+      }
+    }
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -108,12 +123,72 @@ export function useAuth() {
     return { data, error: null };
   };
 
+  const autoSignIn = async () => {
+    // Create a mock user session for John Adams
+    const mockUser = {
+      id: 'john-adams-id',
+      email: 'john.adams@example.com',
+      user_metadata: {
+        display_name: 'John Adams'
+      }
+    } as User;
+
+    const mockSession = {
+      access_token: 'mock-token',
+      refresh_token: 'mock-refresh',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      token_type: 'bearer',
+      user: mockUser
+    } as Session;
+
+    // Set the mock user and session
+    setUser(mockUser);
+    setSession(mockSession);
+    
+    // Create or update profile for John Adams
+    const profileData = {
+      user_id: mockUser.id,
+      email: mockUser.email,
+      display_name: 'John Adams',
+      school_name: null,
+      major: null,
+      graduation_year: null,
+      avatar_url: null
+    };
+
+    // Try to upsert the profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .upsert(profileData, { onConflict: 'user_id' })
+      .select()
+      .single();
+
+    if (!profileError && profile) {
+      setProfile(profile as Profile);
+    } else {
+      // If profile creation fails, set a local profile
+      setProfile(profileData as Profile);
+    }
+
+    // Store in localStorage to persist
+    localStorage.setItem('mock-auth', JSON.stringify({ user: mockUser, session: mockSession, profile: profileData }));
+    
+    toast.success('Welcome, John Adams!');
+    return { data: { user: mockUser, session: mockSession }, error: null };
+  };
+
   const signOut = async () => {
+    // Clear mock auth if it exists
+    localStorage.removeItem('mock-auth');
+    
     const { error } = await supabase.auth.signOut();
-    if (error) {
+    if (error && !error.message.includes('not logged in')) {
       toast.error(error.message);
       return { error };
     }
+    setUser(null);
+    setSession(null);
     setProfile(null);
     toast.success('Signed out successfully');
     return { error: null };
@@ -146,6 +221,7 @@ export function useAuth() {
     loading,
     signUp,
     signIn,
+    autoSignIn,
     signOut,
     updateProfile,
     refetchProfile: () => user && fetchProfile(user.id).then(setProfile)

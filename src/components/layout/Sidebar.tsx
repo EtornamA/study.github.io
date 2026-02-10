@@ -11,7 +11,8 @@ import {
   Moon,
   LogIn,
   LogOut,
-  BookOpen
+  BookOpen,
+  GraduationCap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +25,8 @@ import { useAuth } from '@/hooks/useAuth';
 
 const navigation = [
   { name: 'Calendar', href: '/app/calendar', icon: Calendar },
-  { name: 'To-Do', href: '/app/todo', icon: CheckSquare },
+  { name: 'Classes', href: '/app/classes', icon: GraduationCap },
+  { name: 'Assignments', href: '/app/todo', icon: CheckSquare },
   { name: 'Notebook', href: '/app/notebook', icon: BookOpen },
   { name: 'Weekly Recap', href: '/app/recap', icon: Sparkles },
 ];
@@ -48,12 +50,24 @@ export function Sidebar() {
   const pendingAssignments = assignments.filter(a => a.status !== 'completed').length;
 
   return (
-    <aside
-      className={cn(
-        "fixed left-0 top-0 z-40 h-screen border-r border-border bg-sidebar transition-all duration-300",
-        sidebarOpen ? "w-64" : "w-16"
+    <>
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 sm:hidden"
+          onClick={toggleSidebar}
+        />
       )}
-    >
+      <aside
+        className={cn(
+          "fixed left-0 top-0 z-40 h-screen border-r border-border bg-sidebar transition-all duration-300",
+          // Mobile: drawer that slides in/out
+          "w-64 -translate-x-full sm:translate-x-0",
+          // Desktop: always visible, collapsed or expanded
+          "sm:w-16",
+          sidebarOpen && "translate-x-0 sm:w-64"
+        )}
+      >
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-16 items-center justify-between border-b border-border px-4 bg-sidebar">
@@ -99,7 +113,7 @@ export function Sidebar() {
                 {sidebarOpen && (
                   <span className="flex-1">{item.name}</span>
                 )}
-                {sidebarOpen && item.name === 'To-Do' && pendingAssignments > 0 && (
+                {sidebarOpen && item.name === 'Assignments' && pendingAssignments > 0 && (
                   <Badge variant="default" className="h-5 min-w-5 justify-center px-1.5">
                     {pendingAssignments}
                   </Badge>
@@ -221,5 +235,6 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }

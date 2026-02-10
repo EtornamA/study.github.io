@@ -2,7 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { ClassData, SessionData, DeadlineData, ClassTodoData, ClassFormData } from '@/types/classes';
 import { useToast } from '@/hooks/use-toast';
-import { addDays, parseISO, format, isBefore, isAfter, getDay } from 'date-fns';
+import { addDays, parseISO, format, isBefore, isAfter, getDay, startOfDay, setHours, setMinutes } from 'date-fns';
+import { useAppStore } from '@/store/useAppStore';
+import { useTodoistStore } from '@/store/useTodoistStore';
+import { Event } from '@/types';
 
 export function useClasses() {
   const { toast } = useToast();
@@ -123,10 +126,66 @@ export function useClasses() {
 
       return newClass as ClassData;
     },
-    onSuccess: () => {
+    onSuccess: (newClass, formData) => {
       queryClient.invalidateQueries({ queryKey: ['classes'] });
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
-      toast({ title: 'Class created', description: 'Your class and sessions have been added.' });
+      
+      // Add events to calendar
+      const { addEvent } = useAppStore.getState();
+      const { addTask } = useTodoistStore.getState();
+      
+      // Generate calendar events for the first few weeks
+      const semesterStart = parseISO(formData.semester_start);
+      const semesterEnd = parseISO(formData.semester_end);
+      const classCode = formData.code || formData.name;
+      const sectionText = formData.section_number ? ` Section ${formData.section_number}` : '';
+      
+      // Add calendar events for next 4 weeks
+      const semesterStartDay = getDay(semesterStart);
+      for (let week = 0; week < 4; week++) {
+        formData.meeting_days.forEach((day) => {
+          // Calculate the date for this meeting day in this week
+          let daysToAdd = (day - semesterStartDay + 7) % 7;
+          if (daysToAdd === 0 && day !== semesterStartDay) {
+            daysToAdd = 7;
+          }
+          const eventDate = addDays(semesterStart, week * 7 + daysToAdd);
+          
+          if (eventDate <= semesterEnd && eventDate >= startOfDay(new Date())) {
+            // Add to calendar
+            const calendarEvent: Event = {
+              id: `class-${newClass.id}-${eventDate.getTime()}`,
+              classId: newClass.id,
+              userId: 'user-1',
+              title: `${classCode}${sectionText}`,
+              date: eventDate,
+              startTime: formData.start_time,
+              endTime: formData.end_time,
+              type: 'lecture',
+              location: formData.location,
+              notes: [],
+              createdAt: new Date(),
+            };
+            addEvent(calendarEvent);
+            
+            // Add to Todoist for upcoming classes (next 2 weeks)
+            if (week < 2 && eventDate <= addDays(startOfDay(new Date()), 14)) {
+              addTask({
+                text: `Attend ${classCode}${sectionText} - ${formData.location}`,
+                completed: false,
+                dueDate: startOfDay(eventDate),
+                priority: 'p2',
+                source: newClass.id,
+              });
+            }
+          }
+        });
+      }
+      
+      toast({ 
+        title: 'Class created', 
+        description: 'Your class has been added to calendar and tasks.' 
+      });
     },
     onError: (error) => {
       toast({ 
